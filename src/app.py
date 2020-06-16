@@ -1,7 +1,5 @@
 from flask import Flask
 
-
-
 from blueprints.auth import bp as auth_bp
 from blueprints.users import bp as users_bp
 from blueprints.categories import bp as categories_bp
