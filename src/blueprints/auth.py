@@ -11,6 +11,7 @@ from database import db
 bp = Blueprint('auth', __name__)
 
 
+
 @bp.route('/login', methods=['POST'])
 def login():
     pass

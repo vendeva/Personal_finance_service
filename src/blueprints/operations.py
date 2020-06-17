@@ -15,6 +15,7 @@ from database import db
 bp = Blueprint('operations', __name__)
 
 
+
 class OperationsView(MethodView):
     def get(self):
         pass
