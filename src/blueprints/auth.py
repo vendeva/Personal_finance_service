@@ -30,10 +30,10 @@ def login():
         user = cur.fetchone()
 
     if user is None:  # пользователь не найден
-        return '', 403
+        return '', 401
 
     if not check_password_hash(user['password'], password):  # пароль не правильный
-        return '', 403
+        return '', 401
 
     session['user_id'] = user['id']
     return '', 200
