@@ -10,8 +10,6 @@ from flask import (
 
 from flask.views import MethodView
 
-from auth import auth_required
-
 
 from database import db
 
@@ -20,9 +18,11 @@ bp = Blueprint('categories', __name__)
 
 
 class CategoriesView(MethodView):
-    @auth_required
-    def post(self, user):
-        account_id = user['id']
+    def post(self):
+        session_id = session.get('user_id')
+        if session_id is None:
+            return '', 403
+        account_id = session_id
         request_json = request.json
         name = request_json.get('name')
         parent_id = request_json.get('parent_id')
@@ -76,8 +76,23 @@ class CategoriesView(MethodView):
                 categories = cur_categories.fetchall()
             dict_category = [dict(category) for category in categories]
             rows = {key: value for key, value in dict_category[0].items()}
+            # заменяем parnt_id на parent_name
+            parent_name = rows['parent_id']
+            if parent_name != "none":
+                cur_parent = con.execute(f'''
+                    SELECT name
+                    FROM category
+                    WHERE id = ?''',
+                    (parent_name,),
+                )
+                parent = cur_parent.fetchall()
+                dict_parent = [dict(par) for par in parent]
+                rows = {key: value for key, value in dict_parent[0].items()}
+                parent_name = rows['name']
+            rows = {key: value for key, value in dict_category[0].items()
+                    if "parent_id" not in key}
 
-            return jsonify(**rows), 201
+            return jsonify({"parent_name": parent_name, **rows}), 201
 
 
 class CategoryView(MethodView):
