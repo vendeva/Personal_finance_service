@@ -33,10 +33,14 @@ class CategoryView(MethodView):
         new_data = {
             'account_id': account_id,
             'id': category_id,
-            'parent_id': parent_id
         }
+
         if name is not None:
             new_data['name'] = name
+        if parent_id is not None:
+            if parent_id == 'null':
+                parent_id = None
+            new_data['parent_id'] = parent_id
 
         service = CategoriesService()
 
