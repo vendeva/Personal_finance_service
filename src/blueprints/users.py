@@ -61,6 +61,10 @@ class UsersView(MethodView):
 
 class UserView(MethodView):
     def get(self, user_id):
+        account_id = session.get('id')
+        if not account_id:
+            return '', 403
+        
         service = UsersService()
         try:
             user = service.getuser(user_id)
