@@ -20,9 +20,14 @@ class CategoriesView(MethodView):
 
 class CategoryView(MethodView):
     def patch(self, category_id: int):
-        # account_id = session['id']
-        account_id = 1  # для тестов
+        account_id = session.get('id')
+        if not account_id:
+            return '', 401
+
         request_json = request.json
+        if not request_json:
+            return '', 400
+
         parent_id = request_json.get('parent_id')
         name = request_json.get('name')
         new_data = {
@@ -34,6 +39,13 @@ class CategoryView(MethodView):
             new_data['name'] = name
 
         service = CategoriesService()
+
+        if not service.check(category_id, account_id):
+            return '', 404
+
+        if not service.check(parent_id, account_id):
+            return '', 400
+
         result = service.edit(data=new_data)
         return jsonify(result), 200
 
