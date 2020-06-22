@@ -22,7 +22,7 @@ class CategoryView(MethodView):
     def patch(self, category_id: int):
         account_id = session.get('id')
         if not account_id:
-            return '', 401
+            return '', 403
 
         request_json = request.json
         if not request_json:
