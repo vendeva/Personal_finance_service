@@ -23,7 +23,14 @@ class CategoriesView(MethodView):
         if session_id is None:
             return '', 403
         account_id = session_id
+
         request_json = request.json
+
+        # Проверка заполнены ли переданные поля, иначе -> 400
+        for value in request_json.values():
+            if not value:
+                return '', 400
+
         name = request_json.get('name')
         parent_id = request_json.get('parent_id')
 
