@@ -16,37 +16,6 @@ from database import db
 
 bp = Blueprint('categories', __name__)
 
-def delete_child_category(con, id):
-    # Устанавливаем принадлежность дочерней категории таблице operation
-    cur_operation_category = con.execute(
-        'SELECT category_id '
-        'FROM operation '
-        'WHERE category_id = ? ',
-        (id,),
-    )
-    result_operation_category = cur_operation_category.fetchone()
-    if result_operation_category:
-        return True
-
-    # Ищем дочернюю категорию в таблице category
-    cur_category = con.execute(
-        'SELECT id '
-        'FROM category '
-        'WHERE parent_id = ? ',
-        (id,),
-    )
-    result_category = cur_category.fetchone()
-    if result_category is None:
-        return
-    else:
-        # Удаление дочерней категории
-        con.execute(f"""
-            DELETE FROM category
-            WHERE parent_id = {id}
-        """)
-
-        return delete_child_category(con, result_category["id"])
-
 
 class CategoriesView(MethodView):
     def post(self):
@@ -178,10 +147,18 @@ class CategoryView(MethodView):
                 WHERE id = {category_id}
             """)
 
-            # Ищем id всех дочерних, рекурсивно смотреть записи всех id в таблице operation
-            # если функция вернет true категория принадлежит таблице operation, удаление запрещено -> 403
-            if delete_child_category(con, category_id):
-                return '', 403
+            # Ищем дочернюю категорию в таблице category
+            cur_category = con.execute(
+                'SELECT id '
+                'FROM category '
+                'WHERE parent_id = ? ',
+                (category_id,),
+            )
+            result_category = cur_category.fetchone()
+            if result_category:
+                # Запись в таблицу category parent_id = None
+                category_query = f'UPDATE category SET parent_id = ? WHERE id = ?'
+                con.execute(category_query, (None, result_category["id"]))
 
             con.commit()
 
