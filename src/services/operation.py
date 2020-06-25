@@ -19,7 +19,7 @@ class OperationService:
         self.connection = db.connection
 
     def create_operation(self, data: dict) -> int:
-        """Создание операцию в БД"""
+        """Создание операции в БД"""
 
         values = [value for value in data.values()]
         keys = [key for key in data.keys()]
@@ -34,3 +34,4 @@ class OperationService:
             raise OperationNotFound
         else:
             return cursor.lastrowid
+
