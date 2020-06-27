@@ -61,7 +61,7 @@ class UsersView(MethodView):
 
 class UserView(MethodView):
     def get(self, user_id):
-        account_id = session.get('id')
+        account_id = session.get('user_id')
         if not account_id:
             return '', 403
         
