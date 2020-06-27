@@ -52,7 +52,7 @@ class UsersView(MethodView):
             con.commit()
 
         except sqlite3.IntegrityError:
-            return '', 403
+            return '', 500
         # Исключение пароля из вывода данных
         rows = {key: value for key, value in request_json.items()
                 if "password" not in key}
