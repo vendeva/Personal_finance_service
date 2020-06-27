@@ -51,9 +51,6 @@ class CategoriesView(MethodView):
                 if result_parent["account_id"] != account_id:
                     return '', 403
 
-            # Если не передан parent_id
-            if not parent_id:
-                parent_id = "none"
 
             # Проверяем если вдруг такая категория создана, возвращаем её
             cur_categories = con.execute(f'''
@@ -84,13 +81,13 @@ class CategoriesView(MethodView):
             dict_category = [dict(category) for category in categories]
             rows = {key: value for key, value in dict_category[0].items()}
             # заменяем parnt_id на parent_name
-            parent_name = rows['parent_id']
-            if parent_name != "none":
+            parent_name = "none"
+            if parent_id:
                 cur_parent = con.execute(f'''
                     SELECT name
                     FROM category
                     WHERE id = ?''',
-                    (parent_name,),
+                    (parent_id,),
                 )
                 parent = cur_parent.fetchall()
                 dict_parent = [dict(par) for par in parent]
@@ -99,7 +96,7 @@ class CategoriesView(MethodView):
             rows = {key: value for key, value in dict_category[0].items()
                     if "parent_id" not in key}
 
-            return jsonify({"parent_name": parent_name, **rows}), 201
+            return jsonify({**rows, "parent_name": parent_name}), 201
 
 
 class CategoryView(MethodView):
