@@ -226,8 +226,8 @@ class OperationView(MethodView):
         request_json = request.json
 
         # Проверка заполнены ли переданые поля, иначе -> 400
-        for value in request_json.values():
-            if not value:
+        for key, value in request_json.items():
+            if "description" not in key and not value:
                 return '', 400
 
         # Структуризация исходных данных
