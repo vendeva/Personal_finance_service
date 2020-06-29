@@ -377,8 +377,38 @@ class OperationView(MethodView):
         return jsonify(result), 200
 
     def delete(self, operation_id):
-        pass
+        # Если пользователь не авторизован -> 403
+        session_id = session.get('user_id')
+        if session_id is None:
+            return '', 403
 
+        with db.connection as con:
+
+            try:
+                # Ищем операцию
+                cur = con.execute(
+                    'SELECT account_id '
+                    'FROM operation '
+                    'WHERE id = ? ',
+                    (operation_id,),
+                )
+                result_operation = cur.fetchone()
+                # Если операция не найдена -> 404
+                if result_operation is None:
+                    return '', 404
+                # Если пользователю не принадлежит операция -> 403
+                if result_operation["account_id"] != session_id:
+                    return '', 403
+
+                con.execute(
+                    'DELETE FROM operation '
+                    'WHERE id = ? ',
+                    (operation_id,),
+                )
+
+            except sqlite3.IntegrityError:
+                return '', 403
+        return '', 204
 
 bp.add_url_rule('', view_func=OperationsView.as_view('operations'))
 bp.add_url_rule('/<int:operation_id>', view_func=OperationView.as_view('operation'))
