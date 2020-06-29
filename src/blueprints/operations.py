@@ -22,6 +22,7 @@ from services.operation import OperationService
 
 bp = Blueprint('operations', __name__)
 
+
 def search_child_category_id(con, list_ids):
     id = list_ids[-1]
     cur_category = con.execute(
@@ -35,6 +36,7 @@ def search_child_category_id(con, list_ids):
         list_ids = [*list_ids, result_category["id"]]
         return search_child_category_id(con, list_ids)
     return list_ids
+
 
 class OperationsView(MethodView):
     def get(self):
@@ -57,7 +59,6 @@ class OperationsView(MethodView):
         end_data = request_args.get("to")
         page = request_args.get("page")
         page_size = request_args.get("page_size")
-
 
         params_list = ["account_id = ?"]
         params_values = [session_id]
@@ -83,7 +84,6 @@ class OperationsView(MethodView):
             time_diapazon = f"date BETWEEN strftime('%s', '{start_data}') AND strftime('%s', '{end_data}')"
             params_list = [*params_list, time_diapazon]
 
-
         if type:
             params_list = [*params_list, 'type = ?']
             params_values = [*params_values, type]
@@ -97,11 +97,9 @@ class OperationsView(MethodView):
             category_list = f"category_id IN ({category_params})"
             params_list = [*params_list, category_list]
 
-
         pagination_list = ""
         if page and page_size:
             pagination_list = f'ORDER BY date LIMIT {page_size} OFFSET {(int(page) - 1) * int(page_size)}'
-
 
         # Составляем строку запроса в базу
         operation_params = ""
@@ -116,7 +114,6 @@ class OperationsView(MethodView):
 
         cur = con.execute(operation_query, (*params_values,))
         database_operations = cur.fetchall()
-
 
         operations = {}
         for row in database_operations:
@@ -201,7 +198,6 @@ class OperationsView(MethodView):
             if int(page) < total_pages:
                 next_dict["page"] = int(page) + 1
                 next_url = f'{url_for("operations.operations")}?{urlencode(next_dict)}'
-
 
         result = {
             "operations": [*operations.values()],
@@ -409,6 +405,7 @@ class OperationView(MethodView):
             except sqlite3.IntegrityError:
                 return '', 403
         return '', 204
+
 
 bp.add_url_rule('', view_func=OperationsView.as_view('operations'))
 bp.add_url_rule('/<int:operation_id>', view_func=OperationView.as_view('operation'))

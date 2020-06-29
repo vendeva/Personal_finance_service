@@ -39,8 +39,8 @@ class CategoriesView(MethodView):
                     SELECT name, account_id
                     FROM category
                     WHERE id = ?''',
-                    (parent_id,),
-                )
+                                         (parent_id,),
+                                         )
                 result_parent = cur_parent.fetchone()
                 if result_parent is None:
                     return '', 403
@@ -48,14 +48,13 @@ class CategoriesView(MethodView):
                 if result_parent["account_id"] != account_id:
                     return '', 403
 
-
             # Проверяем если вдруг такая категория создана, возвращаем её
             cur_categories = con.execute(f'''
                 SELECT id, name, parent_id
                 FROM category
                 WHERE name = ? AND account_id = ?''',
-                (name, account_id),
-            )
+                                         (name, account_id),
+                                         )
             categories = cur_categories.fetchall()
 
             if not categories:
@@ -72,8 +71,8 @@ class CategoriesView(MethodView):
                     SELECT id, name, parent_id
                     FROM category
                     WHERE name = ? AND account_id = ?''',
-                    (name, account_id),
-                )
+                                             (name, account_id),
+                                             )
                 categories = cur_categories.fetchall()
             dict_category = [dict(category) for category in categories]
             rows = {key: value for key, value in dict_category[0].items()}
@@ -84,8 +83,8 @@ class CategoriesView(MethodView):
                     SELECT name
                     FROM category
                     WHERE id = ?''',
-                    (parent_id,),
-                )
+                                         (parent_id,),
+                                         )
                 parent = cur_parent.fetchall()
                 dict_parent = [dict(par) for par in parent]
                 rows = {key: value for key, value in dict_parent[0].items()}
@@ -169,7 +168,6 @@ class CategoryView(MethodView):
                 con.execute(category_query, (None, result_category["id"]))
 
             con.commit()
-
 
         except sqlite3.IntegrityError:
             return '', 403
