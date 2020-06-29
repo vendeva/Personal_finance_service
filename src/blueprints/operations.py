@@ -24,7 +24,7 @@ class OperationsView(MethodView):
 
     def post(self):
         # Проверка авторизации
-        account_id = session.get('id')
+        account_id = session.get('user_id')
         if not account_id:
             return '', 403
 
@@ -42,7 +42,7 @@ class OperationsView(MethodView):
             operation = {
                 "date": date,
                 "type": request_json['type'],
-                "description": request_json['description'],
+                "description": request_json.get('description'),
                 "amount": request_json['amount'],
                 "category_id": request_json.get('category_id')
             }
