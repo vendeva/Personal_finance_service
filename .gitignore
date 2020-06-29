@@ -1,5 +1,8 @@
 /.idea
+<<<<<<< HEAD
 /.venv
+=======
+>>>>>>> ccb0a88b84d7e50f20302d4adc85ecde49ed36f3
 /venv
 __pycache__/
 *.pyc
