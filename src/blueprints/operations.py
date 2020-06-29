@@ -50,17 +50,20 @@ class OperationsView(MethodView):
             return "", 400
 
         # Чтение операции из базы
-        category_service = CategoriesService()
-        category = category_service.read(category_id=operation['category_id'], account_id=account_id)
-        if not category:
-            return "", 403
+        if operation.get('category_id') is not None:
+            category_service = CategoriesService()
+            category = category_service.read(category_id=operation['category_id'], account_id=account_id)
+            if not category:
+                return "", 403
 
-        # Получение имени родительской категории
-        parent_category = category_service.read(category_id=category.pop('parent_id'), account_id=account_id)
+            # Получение имени родительской категории
+            parent_category = category_service.read(category_id=category.pop('parent_id'), account_id=account_id)
 
-        # Формирование сведений о категории
-        category.pop('account_id')
-        category['parent_name'] = parent_category.get('name')
+            # Формирование сведений о категории
+            category.pop('account_id')
+            category['parent_name'] = parent_category.get('name')
+        else:
+            category = None
 
         # Запись операции в базу
         operation_service = OperationService()
