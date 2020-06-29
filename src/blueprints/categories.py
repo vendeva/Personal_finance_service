@@ -6,7 +6,8 @@ from flask import (
     jsonify,
     session,
 )
-
+import sqlite3
+from src.database import db
 from flask.views import MethodView
 from src.services.categories import CategoriesService
 
