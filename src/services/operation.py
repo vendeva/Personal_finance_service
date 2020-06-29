@@ -1,6 +1,6 @@
 import sqlite3
 
-from src.database import db
+from database import db
 
 
 class OperationError(Exception):

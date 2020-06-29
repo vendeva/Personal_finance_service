@@ -9,9 +9,9 @@ from flask import (
 )
 from flask.views import MethodView
 from werkzeug.security import generate_password_hash
-from src.services.users import UsersService, UserNotFound
+from services.users import UsersService, UserNotFound
 
-from src.database import db
+from database import db
 
 
 bp = Blueprint('users', __name__)

@@ -7,9 +7,9 @@ from flask import (
     session,
 )
 import sqlite3
-from src.database import db
+from database import db
 from flask.views import MethodView
-from src.services.categories import CategoriesService
+from services.categories import CategoriesService
 
 bp = Blueprint('categories', __name__)
 
