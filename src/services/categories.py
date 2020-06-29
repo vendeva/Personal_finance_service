@@ -38,3 +38,16 @@ class CategoriesService:
                 data['parent_name'] = None
 
         return data
+
+    def read(self, category_id: int, account_id: int) -> dict:
+        """Проверка существования категории"""
+        query = 'SELECT * FROM category WHERE id = ? AND account_id = ?'
+        params = (category_id, account_id)
+
+        with self.connection as connection:
+            cursor = connection.execute(query, params)
+            category = cursor.fetchone()
+
+        if not category:
+            return {}
+        return dict(category)
