@@ -44,7 +44,8 @@ class OperationsView(MethodView):
                 "type": request_json['type'],
                 "description": request_json.get('description'),
                 "amount": request_json['amount'],
-                "category_id": request_json.get('category_id')
+                "category_id": request_json.get('category_id'),
+                "account_id": account_id,
             }
         except KeyError as e:
             return "", 400
