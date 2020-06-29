@@ -9,10 +9,9 @@ from flask import (
 )
 from flask.views import MethodView
 from werkzeug.security import generate_password_hash
+from src.services.users import UsersService, UserNotFound
 
-
-from database import db
-
+from src.database import db
 
 
 bp = Blueprint('users', __name__)
@@ -62,7 +61,17 @@ class UsersView(MethodView):
 
 class UserView(MethodView):
     def get(self, user_id):
-        pass
+        account_id = session.get('user_id')
+        if not account_id:
+            return '', 403
+        
+        service = UsersService()
+        try:
+            user = service.getuser(user_id)
+        except UserNotFound:
+            return '', 404
+        else:
+            return jsonify(user), 200
 
 
 bp.add_url_rule('', view_func=UsersView.as_view('users'))
