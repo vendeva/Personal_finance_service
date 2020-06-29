@@ -14,8 +14,11 @@ from flask import (
 )
 from flask.views import MethodView
 
-from database import db
+from src.database import db
+from datetime import time
 
+from src.services.categories import CategoriesService
+from src.services.operation import OperationService
 
 bp = Blueprint('operations', __name__)
 
@@ -32,7 +35,6 @@ def search_child_category_id(con, list_ids):
         list_ids = [*list_ids, result_category["id"]]
         return search_child_category_id(con, list_ids)
     return list_ids
-
 
 class OperationsView(MethodView):
     def get(self):
@@ -212,7 +214,58 @@ class OperationsView(MethodView):
         return jsonify(result), 200
 
     def post(self):
-        pass
+        # Проверка авторизации
+        account_id = session.get('user_id')
+        if not account_id:
+            return '', 403
+
+        request_json = request.json
+
+        # Обработка даты
+        date = request_json.get('date')
+        if date:
+            date = int(time.mktime(time.strptime(date, "%Y-%m-%d %H:%M:%S")))
+        else:
+            date = int(time.time())
+
+        # Обработка данных и валидация
+        try:
+            operation = {
+                "date": date,
+                "type": request_json['type'],
+                "description": request_json.get('description'),
+                "amount": request_json['amount'],
+                "category_id": request_json.get('category_id'),
+                "account_id": account_id,
+            }
+        except KeyError as e:
+            return "", 400
+
+        # Чтение операции из базы
+        if operation.get('category_id') is not None:
+            category_service = CategoriesService()
+            category = category_service.read(category_id=operation['category_id'], account_id=account_id)
+            if not category:
+                return "", 403
+
+            # Получение имени родительской категории
+            parent_category = category_service.read(category_id=category.pop('parent_id'), account_id=account_id)
+
+            # Формирование сведений о категории
+            category.pop('account_id')
+            category['parent_name'] = parent_category.get('name')
+        else:
+            category = None
+
+        # Запись операции в базу
+        operation_service = OperationService()
+        operation_service.create_operation(data=operation)
+
+        # Формируем ответ
+        operation.pop('category_id')
+        operation['category'] = category
+
+        return jsonify(operation), 201
 
 
 class OperationView(MethodView):
@@ -325,7 +378,6 @@ class OperationView(MethodView):
 
     def delete(self, operation_id):
         pass
-
 
 
 bp.add_url_rule('', view_func=OperationsView.as_view('operations'))
