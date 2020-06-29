@@ -15,7 +15,7 @@ from flask import (
 from flask.views import MethodView
 
 from database import db
-from datetime import time
+
 
 from services.categories import CategoriesService
 from services.operation import OperationService
