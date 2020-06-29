@@ -47,7 +47,7 @@ class CategoryView(MethodView):
         if not service.check(category_id, account_id):
             return '', 404
 
-        if not service.check(parent_id, account_id):
+        if parent_id is not None and not service.check(parent_id, account_id):
             return '', 400
 
         result = service.edit(data=new_data)
