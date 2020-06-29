@@ -24,7 +24,7 @@ class OperationService:
         values = [value for value in data.values()]
         keys = [key for key in data.keys()]
 
-        query = f"INSERT INTO operation " + ','.join(keys) + " VALUES (?, ?, ?, ?, ?, ?)"
+        query = f"INSERT INTO operation (" + ','.join(keys) + ") VALUES (?, ?, ?, ?, ?, ?)"
 
         try:
             with self.connection as connection:
